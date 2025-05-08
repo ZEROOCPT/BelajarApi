@@ -1,6 +1,8 @@
 package com.example.belajarapi;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -46,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<TeamResponse> call, Throwable t) {
+                Toast.makeText(MainActivity.this, "GAGAL "+ t.getMessage(), Toast.LENGTH_SHORT).show();
                 Log.e("API_ERROR", "Gagal mengambil data: " + t.getMessage());
             }
         });

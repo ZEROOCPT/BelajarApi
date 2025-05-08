@@ -34,8 +34,8 @@ public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.TeamViewHolder
 
         // Load badge tim dengan Glide
         Glide.with(holder.itemView.getContext())
-                .load(team.getStrTeamBadge())   
-                .into(holder.imageBadge);
+                .load(team.getStrTeamBadge())
+                .into(holder.rvBadge);
     }
 
     @Override
@@ -46,13 +46,13 @@ public class TeamAdapter extends RecyclerView.Adapter<TeamAdapter.TeamViewHolder
     // ViewHolder = class yang pegang referensi UI tiap item
     public static class TeamViewHolder extends RecyclerView.ViewHolder {
         TextView textTeamName, textStadium;
-        ImageView imageBadge;
+        ImageView rvBadge;
 
         public TeamViewHolder(View itemView) {
             super(itemView);
             textTeamName = itemView.findViewById(R.id.textTeamName);
             textStadium = itemView.findViewById(R.id.textStadium);
-            imageBadge = itemView.findViewById(R.id.imageBadge);
+            rvBadge = itemView.findViewById(R.id.rvBadge);
         }
     }
 }
