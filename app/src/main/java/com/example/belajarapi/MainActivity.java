@@ -13,7 +13,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-// MainActivity = tempat aplikasi dijalankan
 public class MainActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
@@ -25,40 +24,62 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Inisialisasi RecyclerView
+
         recyclerView = findViewById(R.id.recyclerViewTeams);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        // Hubungkan ProgressBar dengan ID-nya
         pb = findViewById(R.id.pb);
-        // Panggil method untuk ambil data tim dari API
-        fetchTeams();
+
+        // Ambil nilai "checker" dari Intent
+        // 0 = Liga Spanyol, 1 = tampilkan Premier League
+        int checker = getIntent().getIntExtra("checker", 0);
+
+        // Panggil  untuk ambil data dari API sesuai pilihan
+        fetchTeams(checker);
     }
 
-    private void fetchTeams() {
-        // Inisialisasi API client
-        SportsApi api = ApiClient.getClient().create(SportsApi.class);
-        Call<TeamResponse> call = api.getTeams("English Premier League");
+    // untuk mengambil data dari API
+    private void fetchTeams(int checker) {
+        SportsApi api = ApiClient.getClient().create(SportsApi.class); // Inisialisasi Retrofit
 
-        // Panggil API secara async
+        Call<TeamResponse> call;
+
+        // ngecek kalau 1 ke liga english selain itu ke spayol
+        if (checker == 1) {
+            call = api.getTeamsByLeague("English Premier League");
+        } else {
+            call = api.getTeamsByCountry("Soccer", "Spain");
+        }
+
+        //loading ui
+        pb.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.GONE);
+
+        // Jalankan API secara async
         call.enqueue(new Callback<TeamResponse>() {
             @Override
             public void onResponse(Call<TeamResponse> call, Response<TeamResponse> response) {
+                //if succeed
                 if (response.isSuccessful() && response.body() != null) {
+                    List<Team> teams = response.body().getTeams(); // Ambil daftar tim
+
+                    // kebutuhan recylerview
+                    adapter = new TeamAdapter(teams);
+
+                    // tampil data ke RecyclerView
+                    recyclerView.setAdapter(adapter);
                     recyclerView.setVisibility(View.VISIBLE);
                     pb.setVisibility(View.GONE);
-
-                    List<Team> teams = response.body().getTeams();
-                    adapter = new TeamAdapter(teams);
-                    recyclerView.setAdapter(adapter);
-
-
                 }
             }
 
             @Override
             public void onFailure(Call<TeamResponse> call, Throwable t) {
-                Toast.makeText(MainActivity.this, "GAGAL "+ t.getMessage(), Toast.LENGTH_SHORT).show();
-                Log.e("API_ERROR", "Gagal mengambil data: " + t.getMessage());
+                // nampilin pesan error
+                Toast.makeText(MainActivity.this, "GAGAL: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e("API_ERROR", "Gagal " + t.getMessage());
+                pb.setVisibility(View.GONE); // Sembunyikan loading walaupun gagal
             }
         });
     }
