@@ -1,6 +1,8 @@
 package com.example.belajarapi;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,6 +18,7 @@ public class MainActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private TeamAdapter adapter;
+    private ProgressBar pb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerViewTeams);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        pb = findViewById(R.id.pb);
         // Panggil method untuk ambil data tim dari API
         fetchTeams();
     }
@@ -40,9 +44,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<TeamResponse> call, Response<TeamResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
+                    recyclerView.setVisibility(View.VISIBLE);
+                    pb.setVisibility(View.GONE);
+
                     List<Team> teams = response.body().getTeams();
                     adapter = new TeamAdapter(teams);
                     recyclerView.setAdapter(adapter);
+
+
                 }
             }
 
